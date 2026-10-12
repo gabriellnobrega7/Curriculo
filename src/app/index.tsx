@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  ScrollView,
-  Image,
   TouchableOpacity,
-  SafeAreaView,
-  ActivityIndicator,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -77,10 +78,10 @@ export default function HomeScreen() {
 
         {/* Card Perfil */}
         <View style={styles.profileCard}>
-          <Image
-            source={{ uri: 'https://github.com/github.png' }}
-            style={styles.profileImage}
-          />
+        <Image
+        source={require('../../assets/images/foto.png')}
+        style={styles.profileImage}
+        />
           <Text style={styles.profileName}>Gabriel Soares</Text>
           <Text style={styles.profileRole}>Estudante na UNICAP</Text>
         </View>
