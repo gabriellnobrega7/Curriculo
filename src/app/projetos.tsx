@@ -1,113 +1,93 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Linking,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  ScrollView,
   TouchableOpacity,
-  SafeAreaView,
-  Linking,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import api from '../services/api';
+import { User } from '../types/curriculum';
 
 export default function ProjetosScreen() {
-  const abrirLinkPremiado = () => {
-    Linking.openURL(
-      'https://www.alphalumen.ong.br/tbs-2020-revela-projetos-alinhados-com-os-objetivos-da-agenda-2030/'
+  const [profile, setProfile] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProjectsData() {
+      try {
+        const response = await api.get('/users/1/full');
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar dados de projetos da API:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProjectsData();
+  }, []);
+
+ const abrirLink = (url: string) => {
+  // Substitui o link antigo do banco pelo repositório real correto
+  let urlCorreta = 'https://github.com/gabriellnobrega7/curriculo-api-aos';
+
+  if (typeof window !== 'undefined') {
+    window.open(urlCorreta, '_blank');
+  } else {
+    Linking.openURL(urlCorreta);
+  }
+};
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1E3A8A" />
+      </View>
     );
-  };
+  }
+
+  // Mapeia usando "Projects" (com P maiúsculo) vindo do Sequelize / NeonDB
+  const projects = profile?.Projects || (profile as any)?.projects || [];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* Seção: Projetos Formais */}
         <View style={styles.sectionHeader}>
-          <Ionicons name="trophy-outline" size={24} color="#1E3A8A" />
-          <Text style={styles.sectionTitle}>Projetos Formais</Text>
+          <Ionicons name="code-slash-outline" size={24} color="#1E3A8A" />
+          <Text style={styles.sectionTitle}>Projetos & Repositórios</Text>
         </View>
 
-        <View style={styles.card}>
-          <View style={styles.itemRow}>
-            <Ionicons name="ribbon-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Projeto sustentável premiado no TBS 2020</Text>
+        {projects.map((proj: any) => (
+          <View key={proj.id} style={styles.card}>
+            <View style={styles.itemRow}>
+              <Ionicons name="folder-open-outline" size={22} color="#2563EB" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.itemText}>{proj.title}</Text>
+                {proj.description ? (
+                  <Text style={styles.itemSubText}>{proj.description}</Text>
+                ) : null}
+
+                {proj.link ? (
+                  <TouchableOpacity 
+                    style={styles.githubButton} 
+                    onPress={() => abrirLink(proj.link)}
+                  >
+                    <Ionicons name="logo-github" size={16} color="#FFFFFF" />
+                    <Text style={styles.githubButtonText}>Acessar Repositório</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
           </View>
-          
-          <View style={styles.itemRow}>
-            <Ionicons name="business-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Grow Up Unicap + Porto Digital • 2026</Text>
-          </View>
+        ))}
 
-          <View style={styles.itemRow}>
-            <Ionicons name="rocket-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Rise Up em parceria com a Beyond • 2025</Text>
-          </View>
-
-          <View style={styles.itemRow}>
-            <Ionicons name="easel-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>
-              Palestra sobre Inovação e Tecnologia: O Uso da IA • 2026
-            </Text>
-          </View>
-
-          {/* Destaque / Link Externo */}
-          <TouchableOpacity style={styles.linkButton} onPress={abrirLinkPremiado}>
-            <Ionicons name="open-outline" size={18} color="#FFFFFF" />
-            <Text style={styles.linkButtonText}>Visualizar Projeto Premiado (TBS 2020)</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Seção: Projetos Informais */}
-        <View style={styles.sectionHeader}>
-          <Ionicons name="cube-outline" size={24} color="#1E3A8A" />
-          <Text style={styles.sectionTitle}>Projetos Informais</Text>
-        </View>
-
-        <View style={styles.card}>
-          <View style={styles.itemRow}>
-            <Ionicons name="heart-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Projeto de rifa beneficente</Text>
-          </View>
-
-          <View style={styles.itemRow}>
-            <Ionicons name="shapes-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>
-              Projeto de matemática: Geometria Espacial em 3D (Com premiação escolar)
-            </Text>
-          </View>
-        </View>
-
-        {/* Seção: Cursos Recentes */}
-        <View style={styles.sectionHeader}>
-          <Ionicons name="book-outline" size={24} color="#1E3A8A" />
-          <Text style={styles.sectionTitle}>Cursos Recentes</Text>
-        </View>
-
-        <View style={styles.card}>
-          <View style={styles.itemRow}>
-            <Ionicons name="code-slash-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Curso de Programação Web</Text>
-          </View>
-
-          <View style={styles.itemRow}>
-            <Ionicons name="language-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Curso Básico de Inglês • 2025</Text>
-          </View>
-
-          <View style={styles.itemRow}>
-            <Ionicons name="document-text-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>Curso de Excel Intermediário • 2025</Text>
-          </View>
-
-          <View style={styles.itemRow}>
-            <Ionicons name="hardware-chip-outline" size={20} color="#2563EB" />
-            <Text style={styles.itemText}>
-              Manutenção de Sistemas Elétricos (SENAI) • 2026
-            </Text>
-          </View>
-        </View>
-
-        {/* Footer */}
+        {/* Rodapé */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2026 Gabriel Soares</Text>
         </View>
@@ -122,6 +102,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8FAFC',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+  },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
@@ -131,7 +117,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     marginTop: 10,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
@@ -142,42 +128,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 18,
-    marginBottom: 20,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    gap: 14,
   },
   itemRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 12,
   },
   itemText: {
-    fontSize: 14,
-    color: '#334155',
-    flex: 1,
-    lineHeight: 20,
-    fontWeight: '500',
+    fontSize: 16,
+    color: '#0F172A',
+    fontWeight: '700',
+    marginBottom: 4,
   },
-  linkButton: {
-    backgroundColor: '#1E3A8A',
+  itemSubText: {
+    fontSize: 14,
+    color: '#475569',
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  githubButton: {
+    backgroundColor: '#0F172A',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    marginTop: 8,
-    gap: 8,
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
   },
-  linkButtonText: {
+  githubButtonText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 20,
   },
   footerText: {
     fontSize: 12,
