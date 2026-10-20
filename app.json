@@ -2,6 +2,7 @@
   "expo": {
     "name": "curriculo-1",
     "slug": "curriculo-1",
+    "owner": "gabriel7s-team",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -37,6 +38,18 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "bef83a6b-0997-4e70-be7a-6581e3416a56"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bef83a6b-0997-4e70-be7a-6581e3416a56"
     }
   }
 }
