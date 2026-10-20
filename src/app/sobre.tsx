@@ -1,12 +1,11 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import {
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  ScrollView,
-  SafeAreaView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function SobreScreen() {
   return (
@@ -100,19 +99,20 @@ export default function SobreScreen() {
         </View>
 
         <View style={styles.card}>
-          <View style={styles.extraItem}>
-            <Ionicons name="partly-sunny-outline" size={22} color="#2563EB" />
-            <Text style={styles.extraText}>
-              Widget dinâmico de previsão do tempo integrado diretamente na página inicial.
-            </Text>
-          </View>
-          <View style={styles.extraItem}>
-            <Ionicons name="cloud-download-outline" size={22} color="#2563EB" />
-            <Text style={styles.extraText}>
-              Consumo assíncrono de API REST na nuvem para renderização das informações do portfólio.
-            </Text>
-          </View>
-        </View>
+  <View style={styles.extraItem}>
+    <Ionicons name="swap-horizontal-outline" size={22} color="#2563EB" />
+    <Text style={styles.extraText}>
+      Seletor de currículo no cabeçalho: alterna entre Gabriel e Maria e todas as telas
+      são atualizadas com os dados da pessoa escolhida.
+    </Text>
+  </View>
+  <View style={styles.extraItem}>
+    <Ionicons name="cloud-download-outline" size={22} color="#2563EB" />
+    <Text style={styles.extraText}>
+      Consumo de API REST publicada na nuvem (Vercel + NeonDB) para renderizar o portfólio.
+    </Text>
+  </View>
+</View>
 
         {/* Footer */}
         <View style={styles.footer}>

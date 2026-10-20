@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'https://curriculo-api-aos-seven.vercel.app/api',
 });
 
-// Garante compatibilidade total de exportação para Web e Mobile no Expo
 export default api;

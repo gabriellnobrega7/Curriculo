@@ -8,18 +8,20 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useUser } from '../context/UserContext';
 import api from '../services/api';
 import { User } from '../types/curriculum';
 
 export default function ProfissionalScreen() {
+  const { userId } = useUser();
   const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadWorkData() {
+      setLoading(true);
       try {
-        const response = await api.get('/users/1/full');
-        console.log('Dados da API Profissional:', response.data);
+        const response = await api.get(`/users/${userId}/full`);
         setProfile(response.data);
       } catch (error) {
         console.error('Erro ao buscar dados profissionais da API:', error);
@@ -27,9 +29,8 @@ export default function ProfissionalScreen() {
         setLoading(false);
       }
     }
-
     loadWorkData();
-  }, []);
+  }, [userId]);
 
   if (loading) {
     return (
@@ -39,13 +40,17 @@ export default function ProfissionalScreen() {
     );
   }
 
-  // Tenta pegar de workExperiences ou de qualquer variação que o back-end mande
-  const experiences = profile?.workExperiences || (profile as any)?.experiences || [];
+  const experiences = (profile as any)?.ProfessionalExperiences || [];
+
+  const formatPeriod = (start?: string, end?: string | null) => {
+    const s = start ? start.slice(0, 4) : '';
+    const e = end ? end.slice(0, 4) : 'Atual';
+    return s ? `${s} - ${e}` : '';
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        
         {experiences.length > 0 ? (
           experiences.map((exp: any, index: number) => (
             <View key={exp.id || index} style={styles.card}>
@@ -54,34 +59,26 @@ export default function ProfissionalScreen() {
                   <Ionicons name="briefcase-outline" size={22} color="#1E3A8A" />
                 </View>
                 <View style={styles.headerTitleContainer}>
-                  <Text style={styles.roleTitle}>{exp.role || exp.title}</Text>
+                  <Text style={styles.roleTitle}>{exp.role}</Text>
                   <Text style={styles.companyName}>{exp.company}</Text>
                 </View>
                 <View style={styles.badgeYear}>
-                  <Text style={styles.badgeYearText}>{exp.period}</Text>
+                  <Text style={styles.badgeYearText}>
+                    {formatPeriod(exp.startDate, exp.endDate)}
+                  </Text>
                 </View>
               </View>
 
-              <Text style={styles.description}>
-                {exp.description}
-              </Text>
+              <Text style={styles.description}>{exp.description}</Text>
             </View>
           ))
         ) : (
-          // Fallback visual caso o banco venha vazio para você não ficar sem ver nada
-          <View style={styles.card}>
-            <Text style={styles.roleTitle}>Jovem Aprendiz</Text>
-            <Text style={styles.companyName}>Camed MicroCrédito</Text>
-            <Text style={styles.description}>
-              Auxiliar nas demandas internas, gerenciando tarefas e documentos em equipe.
-            </Text>
-          </View>
+          <Text style={styles.description}>Nenhuma experiência cadastrada.</Text>
         )}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2026 Gabriel Soares</Text>
+          <Text style={styles.footerText}>© 2026 {profile?.name}</Text>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useUser } from '../context/UserContext';
 import api from '../services/api';
 import { User } from '../types/curriculum';
 
+const fotoPerfil = require('../../assets/images/foto.png');
+
 export default function HomeScreen() {
- const [data, setData] = useState<User | null>(null);
+  const { userId } = useUser();
+  const [data, setData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUserData() {
+      setLoading(true);
       try {
-        const response = await api.get('/users/1/full');
+        const response = await api.get(`/users/${userId}/full`);
         setData(response.data);
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -19,7 +24,7 @@ export default function HomeScreen() {
       }
     }
     loadUserData();
-  }, []);
+  }, [userId]);
 
   if (loading) {
     return (
@@ -32,20 +37,21 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <View style={styles.avatarPlaceholder}>
-          <Text style={styles.avatarText}>
-            {data?.name ? data.name.substring(0, 2).toUpperCase() : 'GS'}
-          </Text>
-        </View>
-        <Text style={styles.name}>{data?.name || 'Gabriel Soares'}</Text>
-        <Text style={styles.title}>{data?.title || 'Desenvolvedor Full Stack'}</Text>
+        {userId === 1 ? (
+          <Image source={fotoPerfil} style={styles.avatar} />
+        ) : (
+          <View style={[styles.avatar, styles.avatarPlaceholder]}>
+            <Text style={styles.avatarLetter}>{data?.name?.charAt(0)}</Text>
+          </View>
+        )}
+
+        <Text style={styles.name}>{data?.name}</Text>
+        <Text style={styles.title}>{data?.title}</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Sobre Mim</Text>
-        <Text style={styles.bio}>
-          {data?.bio || 'Estudante de Sistemas para Internet na UNICAP, focado em desenvolvimento web e mobile.'}
-        </Text>
+        <Text style={styles.bio}>{data?.bio}</Text>
       </View>
 
       <View style={styles.card}>
@@ -54,7 +60,7 @@ export default function HomeScreen() {
         <Text style={styles.infoText}>Localização: Recife - PE</Text>
       </View>
 
-      <Text style={styles.footer}>© 2026 Gabriel Soares</Text>
+      <Text style={styles.footer}>© 2026 {data?.name}</Text>
     </ScrollView>
   );
 }
@@ -64,18 +70,18 @@ const styles = StyleSheet.create({
   content: { padding: 20, alignItems: 'center' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { alignItems: 'center', marginBottom: 24, marginTop: 10 },
-  avatarPlaceholder: {
+  avatar: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: '#0052CC',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 12,
+    borderWidth: 2,
+    borderColor: '#0052CC',
   },
-  avatarText: { color: '#FFF', fontSize: 28, fontWeight: 'bold' },
+  avatarPlaceholder: { backgroundColor: '#DBEAFE', justifyContent: 'center', alignItems: 'center' },
+  avatarLetter: { fontSize: 32, fontWeight: 'bold', color: '#1E3A8A' },
   name: { fontSize: 24, fontWeight: 'bold', color: '#1E293B' },
-  title: { fontSize: 16, color: '#64748B', marginTop: 4 },
+  title: { fontSize: 16, color: '#64748B', marginTop: 4, textAlign: 'center' },
   card: {
     backgroundColor: '#FFF',
     borderRadius: 12,
